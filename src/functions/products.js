@@ -22,12 +22,7 @@ const handler = (event, context) => {
     entityName
   );
   const response = methodMap[operationName](payload);
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      data: response,
-    }),
-  };
+  return response;
 };
 
 export { handler };
