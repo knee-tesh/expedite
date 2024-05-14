@@ -60,6 +60,7 @@ export default class Mainstack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         PRODUCT_TABLE_NAME: productTable.tableName,
+        PRODUCT_TAXONOMY_TABLE_NAME: productTaxonomyAttributesTable.tableName,
       }
     });
 
