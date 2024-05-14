@@ -4,12 +4,14 @@ const CREATE = "create";
 const UPDATE = "update";
 const DELETE = "delete";
 const GET = "get";
+const LIST = "list";
 
 const methodMap = {
   [CREATE]: getProductService().createProduct,
   [UPDATE]: getProductService().updateProduct,
   [DELETE]: getProductService().deleteProduct,
   [GET]: getProductService().getProduct,
+  [LIST]: getProductService().listProduct,
 };
 
 const handler = (event, context) => {

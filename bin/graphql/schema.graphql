@@ -27,7 +27,7 @@ input DeleteProductInput {
   ProductId: ID!
 }
 type Query {
-  getProductById(productId: ID!): Product
+  getProductById(ProductId: ID!): Product
   listProducts: [Product]
 }
 

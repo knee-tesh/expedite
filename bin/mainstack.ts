@@ -102,7 +102,24 @@ export default class Mainstack extends cdk.Stack {
         "payload": {
           "operationName": "get",
           "entityName": "Product",
-          "payload": $util.toJson($ctx.args.input)
+          "payload": $util.toJson($ctx.args)
+        }
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+    });
+
+    lambdaDataSource.createResolver('listProducts',{
+      typeName: 'Query',
+      fieldName: 'listProducts',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "Invoke",
+        "payload": {
+          "operationName": "list",
+          "entityName": "Product",
+          "payload": $util.toJson($ctx.args)
         }
       }
       `),

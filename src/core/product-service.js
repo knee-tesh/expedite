@@ -69,11 +69,19 @@ function getProductService() {
     return result.Item;
   };
 
+  const listProduct = async (payload) => {
+    const result = await documentClient.scan({
+      TableName: process.env.PRODUCT_TABLE_NAME,
+    });
+    return result.Items;
+  };
+
   return {
     createProduct,
     updateProduct,
     deleteProduct,
     getProduct,
+    listProduct,
   };
 }
 
