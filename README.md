@@ -21,7 +21,9 @@ This assignment assumes that the candidate has an AWS account set up. Prerequisi
    > - Stock : Inventory count.
    > - CreatedAt : Timestamp when the product was added.
    > - UpdatedAt : Timestamp of the last update to the product.
-   >   Primary Key:
+
+   > Primary Key:
+   >
    > - Partition Key: ProductId
 
 2. Table Name: **ProductTaxonomyAttributes**
