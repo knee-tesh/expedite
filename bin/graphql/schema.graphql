@@ -16,6 +16,7 @@ input CreateProductInput {
   Stock: Int
 }
 input UpdateProductInput {
+  ProductId: ID!
   Name: String
   Price: Int
   Description: String

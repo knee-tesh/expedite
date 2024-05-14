@@ -100,6 +100,7 @@ export default class Mainstack extends cdk.Stack {
         "operation": "Invoke",
         "payload": {
           "operationName": "get",
+          "entityName": "Product",
           "payload": $util.toJson($ctx.args.input)
         }
       }
@@ -116,7 +117,8 @@ export default class Mainstack extends cdk.Stack {
         "operation": "Invoke",
         "payload": {
           "operationName": "create",
-          "arguments": $util.toJson($ctx.args.input)
+          "entityName": "Product",
+          "payload": $util.toJson($ctx.args.input)
         }
       }
       `),
@@ -131,8 +133,8 @@ export default class Mainstack extends cdk.Stack {
         "version": "2017-02-28",
         "operation": "Invoke",
         "payload": {
-          "field"
           "operationName": "update",
+          "entityName": "Product",
           "payload": $util.toJson($ctx.args.input)
         }
       }
@@ -149,6 +151,7 @@ export default class Mainstack extends cdk.Stack {
         "operation": "Invoke",
         "payload": {
           "operationName": "delete",
+          "entityName": "Product",
           "payload": $util.toJson($ctx.args.input)
         }
       }

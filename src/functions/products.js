@@ -13,8 +13,12 @@ const methodMap = {
 };
 
 const handler = (event, context) => {
-  const { operationName, operationType, entityName, payload } = event;
-  console.log(operationName, operationType, entityName);
+  const { operationName, entityName, payload } = event;
+  console.log(
+    "[CALLED] handler operationName, entityName",
+    operationName,
+    entityName
+  );
   const response = methodMap[operationName](payload);
   return {
     statusCode: 200,

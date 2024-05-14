@@ -7,21 +7,23 @@ const client = new DynamoDBClient({
 
 const documentClient = DynamoDBDocument.from(client);
 
-function getProductService({}) {
+function getProductService() {
   const createProduct = async (payload) => {
     console.log("[CALLED] product service createProduct", payload);
+    const ProductId = new Date().getTime().toString();
     const params = {
       TableName: process.env.PRODUCT_TABLE_NAME,
       Item: {
-        pk: payload.ProductId,
+        pk: ProductId,
         sk: "",
+        ProductId,
         ...payload,
       },
     };
     console.log("[createProduct] params: " + JSON.stringify(params));
     const result = await documentClient.put(params);
     console.log("[createProduct] result: " + JSON.stringify(result));
-    return result;
+    return params.Item;
   };
 
   const updateProduct = async (payload) => {
@@ -36,7 +38,7 @@ function getProductService({}) {
       expressionAttributeValues[`:${items}`] = payload[items];
       updateExpression += `#${items} = :${items}, `;
     }
-    await documentClient.update({
+    return await documentClient.update({
       TableName: process.env.PRODUCT_TABLE_NAME,
       Key: {
         pk: payload.ProductId,
@@ -44,11 +46,12 @@ function getProductService({}) {
       UpdateExpression: updateExpression,
       ExpressionAttributeNames: expressionAttributeNames,
       ExpressionAttributeValues: expressionAttributeValues,
+      ReturnValues: "ALL_NEW",
     });
   };
 
   const deleteProduct = async (payload) => {
-    await documentClient.delete({
+    return await documentClient.delete({
       TableName: process.env.PRODUCT_TABLE_NAME,
       Key: {
         pk: payload.ProductId,
