@@ -9,11 +9,11 @@ type Product {
   UpdatedAt: String!
 }
 input CreateProductInput {
-  Name: String
-  Price: Int
-  Description: String
-  Category: String
-  Stock: Int
+  Name: String!
+  Price: Int!
+  Description: String!
+  Category: String!
+  Stock: Int!
 }
 input UpdateProductInput {
   ProductId: ID!
