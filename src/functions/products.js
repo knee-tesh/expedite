@@ -6,13 +6,23 @@ const DELETE = "delete";
 const GET = "get";
 const LIST = "list";
 
-const methodMap = {
+const productMethodsMap = {
   [CREATE]: getProductService().createProduct,
   [UPDATE]: getProductService().updateProduct,
   [DELETE]: getProductService().deleteProduct,
   [GET]: getProductService().getProduct,
   [LIST]: getProductService().listProduct,
 };
+
+const categoryMethodsMap = {
+  [CREATE]: getProductService().createCategory,
+  [UPDATE]: getProductService().updateCategory,
+  [DELETE]: getProductService().deleteCategory,
+  [GET]: getProductService().getCategory,
+  [LIST]: getProductService().listCategories,
+};
+
+const methodMap = { Product: productMethodsMap, Category: categoryMethodsMap };
 
 const handler = (event, context) => {
   const { operationName, entityName, payload } = event;
@@ -21,7 +31,7 @@ const handler = (event, context) => {
     operationName,
     entityName
   );
-  const response = methodMap[operationName](payload);
+  const response = methodMap[entityName][operationName](payload);
   return response;
 };
 

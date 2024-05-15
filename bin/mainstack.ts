@@ -66,7 +66,7 @@ export default class Mainstack extends cdk.Stack {
 
     // Create a log group for the Lambda function
     const logGroup = new LogGroup(this, 'MyLambdaFunctionLogGroup', {
-      logGroupName: `/aws/lambda/products`,
+      logGroupName: `/aws/lambda/${handlerName}`,
       retention: RetentionDays.ONE_DAY, // Set retention period as needed
     });
 
@@ -92,38 +92,53 @@ export default class Mainstack extends cdk.Stack {
     handler.addToRolePolicy(dbPolicy);
 
     const lambdaDataSource = productAPIs.addLambdaDataSource('productsDS', handler);
-    lambdaDataSource.createResolver('getProductById',{
+    const productDBDS = productAPIs.addDynamoDbDataSource('productDBDS', productTable);
+    const productTaxonomyDBDS = productAPIs.addDynamoDbDataSource('productTaxonomyDBDS', productTaxonomyAttributesTable);
+
+    productDBDS.createResolver('getProductById',{
       typeName: 'Query',
       fieldName: 'getProductById',
       requestMappingTemplate: MappingTemplate.fromString(`
       {
         "version": "2017-02-28",
-        "operation": "Invoke",
-        "payload": {
-          "operationName": "get",
-          "entityName": "Product",
-          "payload": $util.toJson($ctx.args)
+        "operation": "GetItem",
+        "key": {
+          "ProductId": $util.dynamodb.toDynamoDBJson($ctx.args.ProductId)
         }
       }
       `),
       responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
     });
 
-    lambdaDataSource.createResolver('listProducts',{
+    productTaxonomyDBDS.createResolver('productCategoryMap',{
+      typeName: 'Product',
+      fieldName: 'Category',
+      requestMappingTemplate: MappingTemplate.fromString(`
+        {
+          "version": "2017-02-28",
+          "operation": "GetItem",
+          "key": {
+            "TaxonomyId": $util.dynamodb.toDynamoDBJson($ctx.source.CategoryId)
+          }
+        }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString(`
+        $util.toJson($ctx.result)
+      `),
+    });
+
+    productDBDS.createResolver('listProducts',{
       typeName: 'Query',
       fieldName: 'listProducts',
       requestMappingTemplate: MappingTemplate.fromString(`
       {
         "version": "2017-02-28",
-        "operation": "Invoke",
-        "payload": {
-          "operationName": "list",
-          "entityName": "Product",
-          "payload": $util.toJson($ctx.args)
-        }
+        "operation": "Scan",
+        "limit": $util.defaultIfNull($ctx.args.limit, 20),
+        "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null))
       }
       `),
-      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+      responseMappingTemplate: MappingTemplate.fromString('$util.toJson($ctx.result.items)'),
     });
 
     lambdaDataSource.createResolver('createProduct',{
@@ -170,6 +185,86 @@ export default class Mainstack extends cdk.Stack {
         "payload": {
           "operationName": "delete",
           "entityName": "Product",
+          "payload": $util.toJson($ctx.args.input)
+        }
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+    });
+
+    productTaxonomyDBDS.createResolver('getCategoryById',{
+      typeName: 'Query',
+      fieldName: 'getCategoryById',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "GetItem",
+        "key": {
+          "TaxonomyId": $util.dynamodb.toDynamoDBJson($ctx.args.TaxonomyId)
+        }
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+    });
+
+    productTaxonomyDBDS.createResolver('listCategories',{
+      typeName: 'Query',
+      fieldName: 'listCategories',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "Scan",
+        "limit": $util.defaultIfNull($ctx.args.limit, 20),
+        "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.args.nextToken, null))
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$util.toJson($ctx.result.items)'),
+    });
+
+    lambdaDataSource.createResolver('createCategory',{
+      typeName: 'Mutation',
+      fieldName: 'createCategory',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "Invoke",
+        "payload": {
+          "operationName": "create",
+          "entityName": "Category",
+          "payload": $util.toJson($ctx.args.input)
+        }
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+    });
+
+    lambdaDataSource.createResolver('updateCategory',{
+      typeName: 'Mutation',
+      fieldName: 'updateCategory',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "Invoke",
+        "payload": {
+          "operationName": "update",
+          "entityName": "Category",
+          "payload": $util.toJson($ctx.args.input)
+        }
+      }
+      `),
+      responseMappingTemplate: MappingTemplate.fromString('$utils.toJson($context.result)'),
+    });
+
+    lambdaDataSource.createResolver('deleteCategory',{
+      typeName: 'Mutation',
+      fieldName: 'deleteCategory',
+      requestMappingTemplate: MappingTemplate.fromString(`
+      {
+        "version": "2017-02-28",
+        "operation": "Invoke",
+        "payload": {
+          "operationName": "delete",
+          "entityName": "Category",
           "payload": $util.toJson($ctx.args.input)
         }
       }

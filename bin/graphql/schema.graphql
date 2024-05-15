@@ -1,38 +1,81 @@
+enum CategoryType {
+  TAG
+  CATEGORY
+}
+
+type Category {
+  TaxonomyId: ID!
+  Type: CategoryType!
+  Name: String!
+  Description: String
+  ParentId: String!
+  CreatedAt: String!
+  UpdatedAt: String!
+}
+
+input CreateCategoryInput {
+  Type: CategoryType!
+  Name: String!
+  Description: String
+  ParentId: String!
+}
+
+input UpdateCategoryInput {
+  TaxonomyId: ID!
+  Type: CategoryType!
+  Name: String!
+  Description: String
+  ParentId: String!
+}
+
+input DeleteCategoryInput {
+  TaxonomyId: ID!
+}
+
 type Product {
   ProductId: ID!
   Name: String!
   Price: Int!
   Description: String!
-  Category: String!
+  Category: Category!
   Stock: Int!
   CreatedAt: String!
   UpdatedAt: String!
 }
+
 input CreateProductInput {
   Name: String!
   Price: Int!
   Description: String!
-  Category: String!
+  CategoryId: ID!
   Stock: Int!
 }
+
 input UpdateProductInput {
   ProductId: ID!
   Name: String
   Price: Int
   Description: String
-  Category: String
+  CategoryId: ID!
   Stock: Int
 }
+
 input DeleteProductInput {
   ProductId: ID!
 }
+
 type Query {
   getProductById(ProductId: ID!): Product
   listProducts: [Product]
+  getCategoryById(TaxonomyId: ID!): Category
+  listCategories: [Category]
 }
 
 type Mutation {
   createProduct(input: CreateProductInput): Product
   updateProduct(input: UpdateProductInput): Product
   deleteProduct(input: DeleteProductInput): Product
+  createCategory(input: CreateCategoryInput): Category
+  updateCategory(input: UpdateCategoryInput): Category
+  deleteCategory(input: DeleteCategoryInput): Category
 }
